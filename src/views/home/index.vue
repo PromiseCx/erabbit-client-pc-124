@@ -12,6 +12,8 @@
   <HomeNew />
   <!-- 人气推荐 -->
   <HomeHot />
+  <!-- 热门品牌 -->
+  <HomeBrand />
 </template>
 
 <script>
@@ -19,6 +21,7 @@ import HomeCategory from './components/home-category.vue'
 import HomeBanner from './components/home-banner.vue'
 import HomeNew from './components/home-new.vue'
 import HomeHot from './components/home-hot.vue'
+import HomeBrand from './components/home-brand.vue'
 
 export default {
   name: 'HomePage',
@@ -26,13 +29,13 @@ export default {
     HomeCategory,
     HomeBanner,
     HomeNew,
-    HomeHot
+    HomeHot,
+    HomeBrand
   }
 }
 </script>
 
 <style scoped lang="less">
-
 /**
    translation组件实现动画，一个元素或组件的（显示|隐藏，创建|删除）
    将需要做动画的元素或组件放在transition组件中
