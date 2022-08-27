@@ -6,11 +6,13 @@
 
 import XtxSkeleton from './xtx-skeleton.vue'
 import XtxCarousel from './Xtx-carousel.vue'
+import XtxMore from './xtx-more.vue'
 
 export default {
   install (app) {
     // 挂载原型方法： app.config.globalProperties
     app.component(XtxSkeleton.name, XtxSkeleton)
     app.component(XtxCarousel.name, XtxCarousel)
+    app.component(XtxMore.name, XtxMore)
   }
 }
