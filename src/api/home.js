@@ -12,3 +12,9 @@ export const findNew = () => request('/home/new', 'get')
 
 // 获取人气推荐
 export const findHot = () => request('/home/hot', 'get')
+
+// 获取产品板块
+export const findGoods = () => request('/home/goods', 'get')
+
+// 获取最新专题
+export const findSpecial = () => request('/home/special', 'get')

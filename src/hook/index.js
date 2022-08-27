@@ -24,6 +24,10 @@ export const useLazyData = (apiFn) => {
           result.value = data.result
         })
       }
+    },
+    // 配置选项,只要相交的比例大于0，就会触发函数
+    {
+      threshold: 0
     }
   )
   return { result, target }

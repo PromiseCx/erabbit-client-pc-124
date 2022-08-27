@@ -6,7 +6,7 @@
           <ul ref="pannel" class="goods-list" v-if="list">
             <li v-for="item in list" :key="item.id">
               <RouterLink to="/">
-                <img :src="item.picture" alt="" />
+                <img v-lazy="item.picture" alt="" />
                 <p class="name">{{ item.title }}</p>
                 <p class="desc">{{ item.alt }}</p>
               </RouterLink>

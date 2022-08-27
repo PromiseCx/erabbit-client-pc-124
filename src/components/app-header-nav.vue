@@ -7,7 +7,7 @@
         <ul>
           <li v-for="sub in item.children" :key="sub.id">
             <RouterLink @click="hide(item)" :to="`/category/sub/${sub.id}`">
-              <img :src="sub.picture" alt="" />
+              <img v-lazy="sub.picture" alt="" />
               <p>{{ sub.name }}</p>
             </RouterLink>
           </li>
