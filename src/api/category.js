@@ -11,3 +11,10 @@ export const findAllCategory = () => request('/home/category/head', 'get')
  * @returns
  */
 export const findTopCategory = (id) => request('/category', 'get', { id })
+
+/**
+ * 获取二级类目的筛选数据
+ * @param {*} id  二级类目的id
+ * @returns
+ */
+export const findSubCategoryFilter = (id) => request('/category/sub/filter', 'get', { id })
