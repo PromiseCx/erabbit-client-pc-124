@@ -18,7 +18,12 @@ const routes = [
 const router = createRouter({
   // mode:hash
   history: createWebHashHistory(),
-  routes
+  routes,
+  scrollBehavior () {
+    // 路由跳转时，跳转到页面的顶部
+    // vue2.0 是通过 x，y，vue3.0是 left，top
+    return { left: 0, top: 0 }
+  }
 })
 
 export default router
