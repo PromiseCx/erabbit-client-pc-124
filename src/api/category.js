@@ -18,3 +18,10 @@ export const findTopCategory = (id) => request('/category', 'get', { id })
  * @returns
  */
 export const findSubCategoryFilter = (id) => request('/category/sub/filter', 'get', { id })
+
+/**
+ * 获取分类下的商品
+ * @param {*} params
+ * @returns
+ */
+export const findSubCategoryGoods = (params) => request('/category/goods/temporary', 'post', params)
