@@ -4,10 +4,10 @@
       <!-- 面包屑 -->
       <sub-bread></sub-bread>
       <!-- 筛选区 -->
-      <sub-filter></sub-filter>
+      <sub-filter @filter-change="filterChange"></sub-filter>
       <!-- 商品面板 -->
       <div class="goods-list">
-        <SubSort />
+        <SubSort @sort-change="sortChange" />
          <ul>
           <li v-for="goods in goodsList" :key="goods.id" >
             <GoodsItem :goods="goods" />
@@ -65,6 +65,7 @@ export default {
     watch(() => route.params.id, (newVal) => {
       if (newVal && route.path === `/category/sub/${newVal}`) {
         finished.value = false
+        // 导致列表为空，加载更多组件顶上来，进入可视区，加载数据
         goodsList.value = []
         reqParams = {
           page: 1,
@@ -73,7 +74,20 @@ export default {
       }
     })
 
-    return { getData, loading, finished, goodsList }
+    // 1. 更改排序组件的筛选数据
+    const sortChange = (sortParams) => {
+      finished.value = false
+      // 合并请求参数，保留之前的参数
+      reqParams = { ...reqParams, ...sortParams }
+      reqParams.page = 1
+      goodsList.value = []
+    }
+    // 2. 更改筛选组件
+    const filterChange = (filterParams) => {
+      console.log(filterParams)
+    }
+
+    return { getData, loading, finished, goodsList, sortChange, filterChange }
   }
 }
 </script>
