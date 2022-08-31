@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="item" v-for="item in filterData.saleProperties" :key="item.id">
-      <div class="head">{{item.name}}：</div>
+      <div class="head">{{item.name}}:</div>
       <div class="body">
         <a @click="changeProp(item,prop.id)" :class="{active:prop.id===item.selectedProp}" href="javascript:;" v-for="prop in item.properties" :key="prop.id">{{prop.name}}</a>
       </div>
