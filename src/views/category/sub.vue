@@ -84,7 +84,11 @@ export default {
     }
     // 2. 更改筛选组件
     const filterChange = (filterParams) => {
-      console.log(filterParams)
+      finished.value = false
+      // 合并请求参数，保留之前参数
+      reqParams = { ...reqParams, ...filterParams }
+      reqParams.page = 1
+      goodsList.value = []
     }
 
     return { getData, loading, finished, goodsList, sortChange, filterChange }
