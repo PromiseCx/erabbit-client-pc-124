@@ -4,7 +4,7 @@
       <dt>{{item.name}}</dt>
       <dd>
         <template v-for="val in item.values" :key="val.name">
-            <img :class="{selected:val.selected}" @click="changeSku(item,val)" v-if="val.picture" :src="val.picture" :title="val.name">
+            <img :class="{selected:val.selected,disabled:val.disabled}" @click="changeSku(item,val)" v-if="val.picture" :src="val.picture" :title="val.name">
             <span :class="{selected:val.selected}"  @click="changeSku(item,val)" v-else>{{val.name}}</span>
         </template>
       </dd>
@@ -13,17 +13,84 @@
 </template>
 
 <script>
+
+import powerSet from '@/vender/power-set'
+
+const spliter = '★'
+
+// 得到一个路径字典对象
+const getPathMap = (skus) => {
+  // 1. 得到一个所有的sku集合，props.goods.skus
+  // 2. 从所有的sku中筛选出有效的sku
+  // 3. 根据有效的sku使用power-set算法得到子集
+  // 4. 根据子集，往路径字典中存储 key：value
+  const pathMap = {}
+  skus.forEach(sku => {
+    if (sku.inventory > 0) {
+      // 计算有库存的sku的子集
+      // 可选值数组
+      const valueArr = sku.specs.map(val => val.valueName)
+      // 可选值数组子集
+      const valueArrPowerSet = powerSet(valueArr)
+      // 遍历子集,往pathMap插入数据
+      valueArrPowerSet.forEach(arr => {
+        // 根据arr得到字符串key
+        const key = arr.join(spliter)
+        // 往字典中设置数据
+        if (pathMap[key]) {
+          pathMap[key].push(sku.id)
+        } else {
+          pathMap[key] = [sku.id]
+        }
+      })
+    }
+  })
+  return pathMap
+}
+
+const getSelectValues = (specs) => {
+  const arr = []
+  specs.forEach(item => {
+    const selectedVal = item.values?.find(val => val.selected)
+    arr.push(selectedVal ? selectedVal.name : undefined)
+  })
+  return arr
+}
+
+// 更新按钮的禁用状态
+const updateDisabledStatus = (specs, pathMap) => {
+  // 1.规定每一个按钮的状态由本身的disabled控制
+  specs.forEach((item, i) => {
+    const selectedValues = getSelectValues(specs)
+    item.values.forEach(val => {
+      // 2.判断当前按钮是否选中
+      if (val.selected) return
+      // 3.拿当前的值按照顺序套入选中的值数组
+      selectedValues[i] = val.name
+      const key = selectedValues.filter(value => value).join(spliter)
+      val.disabled = !pathMap[key]
+    })
+  })
+}
+
 export default {
   name: 'GoodsSku',
   props: {
     goods: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
-  setup () {
+  setup (props) {
+    const pathMap = getPathMap(props.goods.skus)
+
+    // 组件初始化，点击按钮，更新按钮的状态
+    updateDisabledStatus(props.goods.specs, pathMap)
+
     // 1.选中与取消选中，约定每一个按钮都有自己的选中状态数据：selected
     const changeSku = (item, val) => {
+      // 当按钮是禁用的，阻止程序的进行
+      if (item.disabled) return
       if (val.selected) {
         val.selected = false
       } else {
@@ -32,6 +99,8 @@ export default {
         })
         val.selected = true
       }
+      // 点击按钮，更新按钮的状态
+      updateDisabledStatus(props.goods.specs, pathMap)
     }
     return { changeSku }
   }
