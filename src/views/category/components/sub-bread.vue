@@ -1,7 +1,7 @@
 <template>
   <XtxBread>
     <XtxBreadItem to="/">首页</XtxBreadItem>
-        <XtxBreadItem :key="category.top.id" v-if="category.top" to="`/category/${category.top.id}`">{{category.top.name}}</XtxBreadItem>
+        <XtxBreadItem :key="category.top.id" v-if="category.top" :to="`/category/${category.top.id}`">{{category.top.name}}</XtxBreadItem>
     <transition name="fade-right" mode="out-in">
         <XtxBreadItem :key="category.sub.id" v-if="category.sub">{{category.sub.name}}</XtxBreadItem>
     </transition>
