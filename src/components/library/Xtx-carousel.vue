@@ -3,9 +3,16 @@
     <ul class="carousel-body">
         <!-- fade 显示的图片加fade  -->
       <li class="carousel-item" v-for="(item,i) in sliders" :key="i" :class="{fade:index===i}">
-        <RouterLink to="/">
+        <RouterLink v-if="item.imgUrl" to="/">
           <img v-lazy="item.imgUrl" alt="">
         </RouterLink>
+        <div v-else class="slider">
+          <RouterLink v-for="goods in item" :key="goods.id" :to="`/product/${goods.id}`">
+            <img :src="goods.picture" alt="">
+            <p class="name ellipsis">{{goods.name}}</p>
+            <p class="price">&yen;{{goods.price}}</p>
+          </RouterLink>
+        </div>
       </li>
     </ul>
     <a @click="toggle(-1)" href="javascript:;" class="carousel-btn prev"><i class="iconfont icon-angle-left"></i></a>
@@ -54,14 +61,20 @@ export default {
         }
       }, props.duration)
     }
-    watch(() => props.sliders, (newVal) => {
-      if (newVal.length && props.autoPlay) {
-        autoPlayFn()
-      }
-    }, { immediate: true })
+    watch(
+      () => props.sliders,
+      (newVal) => {
+        if (newVal.length && props.autoPlay) {
+          autoPlayFn()
+        }
+      },
+      { immediate: true }
+    )
 
     const stop = () => {
-      if (timer) { clearInterval(timer) }
+      if (timer) {
+        clearInterval(timer)
+      }
     }
 
     const start = () => {
@@ -74,7 +87,7 @@ export default {
       if (flag.value) {
         flag.value = false
         const newIndex = index.value + step
-        if (newIndex > (props.sliders.length - 1)) {
+        if (newIndex > props.sliders.length - 1) {
           index.value = 0
           setTimeout(() => {
             flag.value = true
@@ -105,13 +118,13 @@ export default {
 </script>
 
 <style scoped lang="less">
-.xtx-carousel{
+.xtx-carousel {
   width: 100%;
   height: 100%;
   min-width: 300px;
   min-height: 150px;
   position: relative;
-  .carousel{
+  .carousel {
     &-body {
       width: 100%;
       height: 100%;
@@ -144,21 +157,21 @@ export default {
         display: inline-block;
         width: 12px;
         height: 12px;
-        background: rgba(0,0,0,0.2);
+        background: rgba(0, 0, 0, 0.2);
         border-radius: 50%;
         cursor: pointer;
         ~ span {
           margin-left: 12px;
         }
         &.active {
-          background:  #fff;
+          background: #fff;
         }
       }
     }
     &-btn {
       width: 44px;
       height: 44px;
-      background: rgba(0,0,0,.2);
+      background: rgba(0, 0, 0, 0.2);
       color: #fff;
       border-radius: 50%;
       position: absolute;
@@ -168,10 +181,10 @@ export default {
       line-height: 44px;
       opacity: 0;
       transition: all 0.5s;
-      &.prev{
+      &.prev {
         left: 20px;
       }
-      &.next{
+      &.next {
         right: 20px;
       }
     }
@@ -179,6 +192,31 @@ export default {
   &:hover {
     .carousel-btn {
       opacity: 1;
+    }
+  }
+}
+// 轮播商品
+.slider {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 40px;
+  > a {
+    width: 240px;
+    text-align: center;
+    img {
+      padding: 20px;
+      width: 230px!important;
+      height: 230px!important;
+    }
+    .name {
+      font-size: 16px;
+      color: #666;
+      padding: 0 40px;
+    }
+    .price {
+      font-size: 16px;
+      color: @priceColor;
+      margin-top: 15px;
     }
   }
 }
