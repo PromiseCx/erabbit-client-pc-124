@@ -73,16 +73,36 @@ const updateDisabledStatus = (specs, pathMap) => {
   })
 }
 
+// 默认选中
+const initDefaultSelected = (goods, skuId) => {
+  // 1.找出sku的信息
+  // 2. 遍历每一个按钮，按钮的值和sku记录相同，就选中
+  const sku = goods.skus.find(sku => sku.id === skuId)
+  goods.specs.forEach((item, i) => {
+    const val = item.values.find(val => val.name === sku.specs[i].valueName)
+    val.selected = true
+  })
+}
+
 export default {
   name: 'GoodsSku',
   props: {
     goods: {
       type: Object,
       default: () => ({})
+    },
+    skuId: {
+      type: String,
+      default: ''
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const pathMap = getPathMap(props.goods.skus)
+
+    // 根据skuId初始化选中
+    if (props.skuId) {
+      initDefaultSelected(props.goods, props.skuId)
+    }
 
     // 组件初始化，点击按钮，更新按钮的状态
     updateDisabledStatus(props.goods.specs, pathMap)
@@ -101,6 +121,29 @@ export default {
       }
       // 点击按钮，更新按钮的状态
       updateDisabledStatus(props.goods.specs, pathMap)
+      // 选择的sku信息传递给父组件
+      // 传递完整的sku信息，提交给父组件，不完整，提交空对象
+      const validSelectedValues = getSelectValues(props.goods.specs).filter(v => v)
+      if (validSelectedValues.length === props.goods.specs.length) {
+        const skuIds = pathMap[validSelectedValues.join(spliter)]
+        const sku = props.goods.skus.find(sku => sku.id === skuIds[0])
+        emit('change', {
+          skuId: sku.id,
+          price: sku.price,
+          oldPrice: sku.oldPrice,
+          inventory: sku.inventory,
+          // 属性：属性值 属性：属性值.....
+          /**
+           * reduce((p，c)=>{},0)
+           * 第一个参数，回调函数： p：上一个值，c：当前值
+           * 第二个参数，初始的累加和
+           */
+          specsText: sku.specs.reduce((p, c) => `${p} ${c.name}: ${c.valueName}`, '').trim()
+        })
+      } else {
+        // 数据不完整
+        emit('change', {})
+      }
     }
     return { changeSku }
   }
