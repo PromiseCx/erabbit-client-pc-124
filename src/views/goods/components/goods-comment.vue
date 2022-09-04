@@ -19,7 +19,7 @@
       <a @click="changeSort('praiseCount')" :class="{active:reqParams.sortField === 'praiseCount'}" href="javascript:;">最热</a>
     </div>
     <!-- 评价列表 -->
-    <div class="list" v-if="commentList">
+    <div class="list" v-if="commentList.length">
       <div class="item" v-for="item in commentList" :key="item.id">
         <div class="user">
           <img :src="item.member.avatar" alt="">
@@ -32,6 +32,8 @@
             <span class="attr">{{formatSpecs(item.orderInfo.specs)}}</span>
           </div>
           <div class="text">{{item.content}}</div>
+          <!-- image -->
+          <GoodsCommentImage v-if="item.pictures.length" :pictures="item.pictures"/>
           <div class="time">
             <span>{{item.createTime}}</span>
             <span class="zan"><i class="iconfont icon-dianzan"></i>{{item.praiseCount}}</span>
@@ -39,15 +41,19 @@
         </div>
       </div>
     </div>
+    <!-- xtx-pagination -->
+      <XtxPagination v-if="total" @current-change="changePagerFn" :total="total" :page-size="reqParams.pageSize" :current-page="reqParams.page"/>
   </div>
 </template>
 
 <script>
 import { findGoodsCommentInfo, findGoodsCommentList } from '@/api/product'
 import { inject, ref, reactive, watch } from 'vue'
+import GoodsCommentImage from './goods-comment-image.vue'
 
 export default {
   name: 'GoodsComment',
+  components: { GoodsCommentImage },
   setup () {
     // 获取评价信息
     const commentInfo = ref(null)
@@ -88,9 +94,11 @@ export default {
 
     // 初始化发起请，筛选条件改变发起请求
     const commentList = ref([])
+    const total = ref(0)
     watch(reqParams, () => {
-      findGoodsCommentList(goods.id, reqParams).then(data => {
+      findGoodsCommentList(goods.value.id, reqParams).then(data => {
         commentList.value = data.result.items
+        total.value = data.result.counts
       })
     }, { immediate: true })
 
@@ -108,7 +116,11 @@ export default {
       return nickName.substr(0, 1) + '****' + nickName.substr(-1)
     }
 
-    return { commentInfo, currentTagIndex, changeTag, reqParams, commentList, changeSort, formatSpecs, formatNickName }
+    const changePagerFn = (newPage) => {
+      reqParams.page = newPage
+    }
+
+    return { commentInfo, currentTagIndex, changeTag, reqParams, commentList, changeSort, formatSpecs, formatNickName, total, changePagerFn }
   }
 }
 </script>

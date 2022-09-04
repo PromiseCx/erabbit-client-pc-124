@@ -29,7 +29,7 @@
         <div class="head">
           <h3>- {{item.name}} -</h3>
           <p class="tag">{{item.desc}}</p>
-          <XtxMore />
+          <XtxMore :path="`/category/sub/${item.id}`" />
         </div>
         <div class="body">
           <GoodsItem v-for="g in item.goods" :key="g.id" :goods="g" />
