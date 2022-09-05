@@ -12,12 +12,17 @@ export default {
         account: '',
         mobile: '',
         token: ''
-      }
+      },
+      //  登陆后回跳的路径
+      redirectUrl: '/'
     }
   },
   mutations: {
     setUser (state, payload) {
       state.profile = payload
+    },
+    setRedirectUrl (state, url) {
+      state.redirectUrl = url
     }
   }
 }

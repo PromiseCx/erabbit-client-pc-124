@@ -21,9 +21,20 @@ module.exports = defineConfig({
       ]
     }
   },
-  devServer: {
-    open: true,
-    host: 'localhost',
-    port: 8080
+  // devServer: {
+  //   open: true,
+  //   host: 'localhost',
+  //   port: 8080
+  // },
+
+  // 这个是给webpack-dev-server开启可IP和域名访问权限。
+  configureWebpack: {
+    devServer: {
+      // disableHostCheck: true
+      allowedHosts: ['www.corho.com'] // www.corho.com=>扫码授权后的回调地址
+    },
+    externals: {
+      qc: 'QC'
+    }
   }
 })

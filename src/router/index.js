@@ -15,6 +15,10 @@ const routes = [
   {
     path: '/login',
     component: () => import('@/views/login')
+  },
+  {
+    path: '/login/callback',
+    component: () => import('@/views/login/callback.vue')
   }
 ]
 
