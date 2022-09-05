@@ -46,7 +46,7 @@
           <div class="input">
             <i class="iconfont icon-code"></i>
             <Field name="code" v-model="form.code" :class="{error:errors.code}" type="text" placeholder="请输入验证码" />
-            <span class="code">发送验证码</span>
+            <span class="code" @click="send()">{{time === 0 ? '发送验证码':`${time}秒后发送`}}</span>
           </div>
           <div class="error" v-if="errors.code">
                 <i class="iconfont icon-warning" />
@@ -80,10 +80,13 @@
 </template>
 
 <script>
-import { reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { Form, Field } from 'vee-validate'
+import { userAccountLogin, userMobileLoginMsg, userMobileLogin } from '@/api/user'
 import schema from '@/utils/vee-validate-schema'
-// import Message from '@/components/library/Message'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
+import Message from '@/components/library/Message'
 
 export default {
   name: 'LoginForm',
@@ -133,16 +136,76 @@ export default {
     //  setup中拿到当前组件实例 proxy
     // const { proxy } = getCurrentInstance()
 
+    /**
+     * useRoute()： 用来获取路由信息
+     * useRouter()：用来跳转路由
+     */
+    const route = useRoute()
+    const router = useRouter()
+
     // 点击登录时，整体表单验证
+    const store = useStore()
     const login = async () => {
       // Form组件提供了整体校验方法，validate，返回的是一个promise对象
       // setup不可使用async 但是里面的函数可以使用async，await
-      await formCom.value.validate()
+      const valid = await formCom.value.validate()
       //   proxy.$message({ type: 'success', text: '111' })
-    //   Message({ type: 'success', text: '111' })
+      //  Message({ type: 'success', text: '111' })
+      if (valid) {
+        try {
+          let data = null
+          if (isMsgLogin.value) {
+          // 手机号登录
+            const { mobile, code } = form
+            data = await userMobileLogin({ mobile, code })
+          } else {
+          // 账号登录
+            const { account, password } = form
+            userAccountLogin({ account, password })
+          }
+          // 存储用户信息
+          const { id, account, avatar, mobile, nickname, token } = data.result
+          store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+          // 进行跳转
+          router.push(route.query.redirectUrl || '/')
+          Message({ type: 'success', text: '登陆成功！' })
+        } catch (error) {
+          Message({ type: 'error', text: error.response.data.message || '登陆失败！' })
+        }
+      }
     }
 
-    return { isMsgLogin, form, mySchema, formCom, login }
+    let timer = null
+    const time = ref(0)
+
+    onMounted(() => {
+      clearInterval(timer)
+    })
+
+    const send = () => {
+      const valid = mySchema.mobile(form.mobile)
+      if (valid === true) {
+        // 校验通过
+        if (time.value === 0) {
+          userMobileLoginMsg(form.mobile).then(() => {
+            Message({ type: 'success', text: '发送验证码成功！' })
+            time.value = 60
+            clearInterval(timer)
+            timer = setInterval(() => {
+              time.value--
+              if (time.value <= 0) clearInterval(timer)
+            }, 1000)
+          }).catch(e => {
+            Message({ type: 'error', text: '发送验证码失败！' })
+          })
+        }
+      } else {
+        // 失败,触发vee的表单校验函数显示错误信息 setFieldError(字段名称，错误信息)
+        formCom.value.setFieldError('mobile', valid)
+      }
+    }
+
+    return { isMsgLogin, form, mySchema, formCom, login, send, time }
   }
 }
 </script>
