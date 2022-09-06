@@ -9,7 +9,8 @@ const routes = [
       { path: '/', component: () => import('@/views/home') },
       { path: '/category/:id', component: () => import('@/views/category/index') },
       { path: '/category/sub/:id', component: () => import('@/views/category/sub') },
-      { path: '/product/:id', component: () => import('@/views/goods/index') }
+      { path: '/product/:id', component: () => import('@/views/goods/index') },
+      { path: '/cart', component: () => import('@/views/cart/index') }
     ]
   },
   {

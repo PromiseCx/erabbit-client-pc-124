@@ -1,5 +1,7 @@
 // 购物车模块
 
+import { getNewCartGoods } from '@/api/cart'
+
 export default {
   namespaced: true,
   state () {
@@ -27,6 +29,22 @@ export default {
         state.list.splice(sameIndex, 1)
       }
       state.list.unshift(payload)
+    },
+    // 修改购物车商品
+    updateCart (state, goods) {
+      // goods信息：nowPrice,isEffective,stock
+      // goods对象字段不固定(但是必须有skuId)，有那些字段就改那些字段，字段的值合理才改
+      const updateGoods = state.list.find(item => item.skuId === goods.skuId)
+      for (const key in goods) {
+        if (goods[key] !== undefined && goods[key] !== null && goods[key] !== '') {
+          updateGoods[key] = goods[key]
+        }
+      }
+    },
+    // 删除商品
+    deleteCart (state, skuId) {
+      const index = state.list.findIndex(item => item.skuId === skuId)
+      state.list.splice(index, 1)
     }
   },
   getters: {
@@ -40,7 +58,27 @@ export default {
     },
     // 有效商品总金额
     validAmount (state, getters) {
-      return getters.validList.reduce((p, c) => p + parseInt(c.nowPrice * 100) * c.count, 0) / 100
+      return getters.validList.reduce((p, c) => p + Math.round(c.nowPrice * 100) * c.count, 0) / 100
+    },
+    // 无效商品列表
+    invalidList (state) {
+      return state.list.filter(item => item.stock <= 0 || !item.isEffective)
+    },
+    // 已选商品列表
+    selectedList (state, getters) {
+      return getters.validList.filter(item => item.selected)
+    },
+    // 已选商品总件数
+    selectedTotal (state, getters) {
+      return getters.selectedList.reduce((p, c) => p + c.count, 0)
+    },
+    // 已选商品总金额
+    selectedAmount (state, getters) {
+      return getters.selectedList.reduce((p, c) => p + Math.round(c.nowPrice * 100) * c.count, 0) / 100
+    },
+    // 是否全选
+    isCheckAll (state, getters) {
+      return getters.validList.length !== 0 && getters.selectedList.length === getters.validList.length
     }
   },
   actions: {
@@ -56,6 +94,40 @@ export default {
         } else {
         // 未登录
           context.commit('insertCart', payload)
+          resolve()
+        }
+      })
+    },
+    // 获取商品列表
+    findCart (context) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // aleady login
+        } else {
+          // not login
+          // 同时发送所有商品请求，等所有请求成功，一起修改本地数据
+          // Promise.all([promise Array]).then(dataList=>{})
+
+          // promise数组
+          const promiseArr = context.state.list.map(goods => {
+            return getNewCartGoods(goods.skuId)
+          })
+          Promise.all(promiseArr).then(dataList => {
+            dataList.forEach((data, i) => {
+              context.commit('updateCart', { skuId: context.state.list[i].skuId, ...data.result })
+            })
+            resolve()
+          })
+        }
+      })
+    },
+    deleteCart (context, payload) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // aleady login
+        } else {
+          // not login
+          context.commit('deleteCart', payload)
           resolve()
         }
       })
