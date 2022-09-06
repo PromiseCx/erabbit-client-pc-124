@@ -18,7 +18,7 @@
             <GoodsName :goods="goods"/>
             <GoodsSku :goods="goods"  @change="changeSku" />
             <XtxNumbox v-model="num" :max="goods.inventory" label="数量"/>
-            <XtxButton type="primary" style="margin-top:20px">加入购物车</XtxButton>
+            <XtxButton type="primary" style="margin-top:20px" @click="insertCart()">加入购物车</XtxButton>
         </div>
       </div>
       <!-- 商品推荐 -->
@@ -54,6 +54,8 @@ import GoodsWarn from './components/goods-warn.vue'
 import { nextTick, provide, ref, watch } from 'vue'
 import { findGoods } from '@/api/product'
 import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
+import Message from '@/components/library/Message'
 
 export default {
   name: 'XtxGoodsPage',
@@ -62,11 +64,12 @@ export default {
     // 1.获取商品详情，进行渲染
     const goods = useGoods()
     const changeSku = (sku) => {
-      if (sku.id) {
+      if (sku.skuId) {
         goods.value.price = sku.price
         goods.value.oldPrice = sku.oldPrice
         goods.value.inventory = sku.inventory
       }
+      currSku.value = sku
     }
 
     // 选择的数量
@@ -74,7 +77,35 @@ export default {
 
     // 提供goods数据给后代使用
     provide('goods', goods)
-    return { goods, changeSku, num }
+
+    // 加入购物车
+    const currSku = ref(null)
+    const store = useStore()
+    const insertCart = () => {
+      if (currSku.value && currSku.value.skuId) {
+        const { skuId, specsText: attrText, inventory: stock } = currSku.value
+        const { name, price, id, mainPictures } = goods.value
+        store.dispatch('cart/insertCart', {
+          id,
+          skuId,
+          attrText,
+          stock,
+          name,
+          price,
+          nowPrice: price,
+          picture: mainPictures[0],
+          selected: true,
+          isEffective: true,
+          count: num.value
+        }).then(() => {
+          Message({ type: 'success', text: '加入购物车成功！' })
+        })
+      } else {
+        Message({ text: '请选择完整规格' })
+      }
+    }
+
+    return { goods, changeSku, num, insertCart }
   }
 }
 

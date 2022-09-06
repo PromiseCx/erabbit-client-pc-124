@@ -26,7 +26,15 @@ module.exports = defineConfig({
   //   host: 'localhost',
   //   port: 8080
   // },
-
+  // devServer: {
+  //   proxy: {
+  //     'https://suggest.taobao.com/api': {
+  //       target: 'https://suggest.taobao.com/api', // API服务器地址（更换为你的路径）
+  //       changeOrigin: true, // 虚拟的站点需要更管origin
+  //       secure: true
+  //     }
+  //   }
+  // },
   // 这个是给webpack-dev-server开启可IP和域名访问权限。
   configureWebpack: {
     devServer: {
