@@ -15,7 +15,7 @@
                         @update：modelValue是用来：修改值
                     在组件中，vuex的数据只能读，不能改,不能用v-model
                  -->
-              <th width="120"><XtxCheckbox :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox></th>
+              <th width="120"><XtxCheckbox @change="checkAll" :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox></th>
               <th width="400">商品信息</th>
               <th width="220">单价</th>
               <th width="180">数量</th>
@@ -26,7 +26,7 @@
           <!-- 有效商品 -->
           <tbody>
             <tr v-for="goods in $store.getters['cart/validList']" :key="goods.skuId">
-              <td><XtxCheckbox :modelValue="goods.selected" /></td>
+              <td><XtxCheckbox @change="($event)=>checkOne(goods.skuId,$event)" :modelValue="goods.selected" /></td>
               <td>
                 <div class="goods">
                   <RouterLink :to="`/product/${goods.id}`"><img :src="goods.picture" alt=""></RouterLink>
@@ -79,7 +79,7 @@
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          <XtxCheckbox :mdoelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox>
+          <XtxCheckbox @change="checkAll" :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox>
           <a href="javascript:;">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
           <a href="javascript:;">清空失效商品</a>
@@ -98,9 +98,21 @@
 
 <script>
 import GoodRelevant from '@/views/goods/components/goods-relevant'
+import { useStore } from 'vuex'
 export default {
   name: 'XtxCartPage',
-  components: { GoodRelevant }
+  components: { GoodRelevant },
+  setup () {
+    const store = useStore()
+    const checkOne = (skuId, selected) => {
+      console.log(skuId, selected)
+      store.dispatch('cart/updateCart', { skuId, selected })
+    }
+    const checkAll = (selected) => {
+      store.dispatch('cart/checkAllCart', selected)
+    }
+    return { checkOne, checkAll }
+  }
 }
 </script>
 

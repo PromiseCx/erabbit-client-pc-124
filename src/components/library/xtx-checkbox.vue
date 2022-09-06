@@ -38,8 +38,10 @@ export default {
     // checked.value 就是父组件的数据
     const checked = useVModel(props, 'modelValue', emit)
     const changeChecked = () => {
+      const newVal = !checked.value
       //   // 通知父组件数据的改变
-      checked.value = !checked.value
+      checked.value = newVal
+      emit('change', newVal)
     }
     return { checked, changeChecked }
   }

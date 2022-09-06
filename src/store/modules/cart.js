@@ -82,6 +82,34 @@ export default {
     }
   },
   actions: {
+    // 修改购物车(选中状态，数量)
+    updateCart (context, payload) {
+      // payload 需要：必要skuId，可能selected，count
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // aleady login
+        } else {
+          // not login
+          context.commit('updateCart', payload)
+          resolve()
+        }
+      })
+    },
+    // 全选与取消全选
+    checkAllCart (context, selected) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // aleady login
+        } else {
+          // not login
+          context.getters.validList.forEach(goods => {
+            context.commit('updateCart', { skuId: goods.skuId, selected })
+          })
+          resolve()
+        }
+      })
+    },
+    // 加入购物车
     insertCart (context, payload) {
       return new Promise((resolve, reject) => {
         /**
