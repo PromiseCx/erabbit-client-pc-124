@@ -49,7 +49,13 @@ export default {
       const newValue = count.value + step
       if (newValue < props.min || newValue > props.max) return
       count.value = newValue
-      emit('change', count.value)
+      // ?为什么返回count.value不行？
+      /**
+       * 应该是；useVModel返回的是计算属性，不是ref，不能直接修改，
+       * 直接修改其实相当于直接修改了props属性，vuex中不允许
+       * 本组件的值在函数结束前并不会立即变化，count.value = newValue 这句应该只是单纯的告诉父组件值变化
+       */
+      emit('change', newValue)
     }
     return { changeNum }
   }

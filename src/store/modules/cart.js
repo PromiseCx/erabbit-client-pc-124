@@ -159,6 +159,40 @@ export default {
           resolve()
         }
       })
+    },
+    // 批量删除购物车
+    batchDeleteCart (context, isClear) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // aleady login
+        } else {
+          // not login
+          // 找出选中的商品
+          context.getters[isClear ? 'invalidList' : 'selectedList'].forEach(item => {
+            context.commit('deleteCart', item.skuId)
+          })
+          resolve()
+        }
+      })
+    },
+    updateCartSku (context, { oldSkuId, newSku }) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // aleady login
+        } else {
+          // not login
+          // 1.找出旧的的商品信息
+          // 2.删除旧的商品数据
+          // 3.根据新的sku信息，和旧的商品信息合并为一个新的购物车商品信息
+          // 4. 添加新的商品
+          const oldGoods = context.state.list.find(item => item.skuId === oldSkuId)
+          context.commit('deleteCart', oldGoods.skuId)
+          const { skuId, price: nowPrice, specsText: attrsText, inventory: stock } = newSku
+          const newGoods = { ...oldGoods, skuId, nowPrice, attrsText, stock }
+          context.commit('insertCart', newGoods)
+          resolve()
+        }
+      })
     }
   }
 }

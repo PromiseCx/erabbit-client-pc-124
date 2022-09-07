@@ -83,12 +83,12 @@ export default {
     const store = useStore()
     const insertCart = () => {
       if (currSku.value && currSku.value.skuId) {
-        const { skuId, specsText: attrText, inventory: stock } = currSku.value
+        const { skuId, specsText: attrsText, inventory: stock } = currSku.value
         const { name, price, id, mainPictures } = goods.value
         store.dispatch('cart/insertCart', {
           id,
           skuId,
-          attrText,
+          attrsText,
           stock,
           name,
           price,
