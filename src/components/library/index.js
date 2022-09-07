@@ -11,6 +11,7 @@ import defaultImg from '@/assets/images/200.png'
 // import XtxBread from './xtx-bread.vue'
 // import XtxBreadItem from './xtx-bread-item.vue'
 import Message from './Message'
+import confirm from './confirm'
 
 /**
  * 自动的批量注册组件:
@@ -49,6 +50,7 @@ export default {
 
     // 定义一个原型函数
     app.config.globalProperties.$message = Message
+    app.config.globalProperties.$confirm = confirm
   }
 }
 
