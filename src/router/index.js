@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import store from '@/store'
 
 const routes = [
   // 一级路由布局容器
@@ -10,7 +11,8 @@ const routes = [
       { path: '/category/:id', component: () => import('@/views/category/index') },
       { path: '/category/sub/:id', component: () => import('@/views/category/sub') },
       { path: '/product/:id', component: () => import('@/views/goods/index') },
-      { path: '/cart', component: () => import('@/views/cart/index') }
+      { path: '/cart', component: () => import('@/views/cart/index') },
+      { path: '/member/checkout', component: () => import('@/views/member/pay/checkout') }
     ]
   },
   {
@@ -34,6 +36,16 @@ const router = createRouter({
     // vue2.0 是通过 x，y，vue3.0是 left，top
     return { left: 0, top: 0 }
   }
+})
+
+// 前置导航守卫
+router.beforeEach((to, from, next) => {
+  // 需要登录的路由地址以 /member 开头
+  const { profile } = store.state.user
+  if (!profile.token && to.path.startsWith('/member')) {
+    return next('/login?redirectUrl=' + encodeURIComponent(to.fullPath))
+  }
+  next()
 })
 
 export default router
