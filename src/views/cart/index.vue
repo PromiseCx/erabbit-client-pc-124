@@ -116,7 +116,6 @@ export default {
   setup () {
     const store = useStore()
     const checkOne = (skuId, selected) => {
-      console.log(skuId, selected)
       store.dispatch('cart/updateCart', { skuId, selected })
     }
     const checkAll = (selected) => {

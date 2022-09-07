@@ -21,7 +21,7 @@ export const userQQBindCode = (mobile) => request('/login/social/code', 'get', {
 
 export const userQQBindLogin = ({ unionId, mobile, code }) => request('/login/social/bind', 'post', { unionId, mobile, code })
 
-export const userQQPatchCode = (mobile) => request('https://apipc-xiaotuxian-front.itheima.net/register/code', 'get', { mobile })
+export const userQQPatchCode = (mobile) => request('/register/code', 'get', { mobile })
 
 export const userCheckAccount = (account) => request('/register/check', 'get', { account })
 

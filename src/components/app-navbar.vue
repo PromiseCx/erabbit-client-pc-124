@@ -40,6 +40,7 @@ export default {
     const router = useRouter()
     const logout = () => {
       store.commit('user/setUser', {})
+      store.commit('cart/setCart', [])
       router.push('/login')
     }
     return { profile, logout }

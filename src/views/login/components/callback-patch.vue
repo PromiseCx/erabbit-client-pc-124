@@ -56,7 +56,7 @@ export default {
     Form,
     Field
   },
-  prosp: {
+  props: {
     unionId: {
       type: String,
       default: ''
@@ -110,15 +110,16 @@ export default {
       const valid = formCom.value.validate()
       if (valid) {
         userQQPatchLogin({
-          mobile: form.mobile,
-          code: form.code,
-          account: form.account,
-          password: form.password
+          unionId: props.unionId,
+          ...form
         }).then(data => {
           const { id, account, avatar, mobile, nickname, token } = data.result
           store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-          router.push(store.user.state.redirectUrl || '/')
-          Message({ type: 'success', text: '登录成功!' })
+          store.dispatch('cart/mergeCart').then(() => {
+            // 进行跳转
+            router.push(store.state.user.redirectUrl)
+            Message({ type: 'success', text: 'QQ信息完善成功!' })
+          })
         }).catch(e => {
           Message({ type: 'error', text: e.response.data.message })
         })

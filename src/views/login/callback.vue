@@ -79,8 +79,11 @@ export default {
             // 跳转到来源页 || 首页
             const { id, account, avatar, mobile, nickname, token } = data.result
             store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-            router.push(store.state.user.redirectUrl)
-            Message({ type: 'success', text: 'QQ登录成功!' })
+            store.dispatch('cart/mergeCart').then(() => {
+            // 进行跳转
+              router.push(store.state.user.redirectUrl)
+              Message({ type: 'success', text: 'QQ登录成功!' })
+            })
           })
           .catch((e) => {
             isBind.value = false

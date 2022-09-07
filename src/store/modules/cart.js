@@ -1,6 +1,6 @@
 // 购物车模块
 
-import { getNewCartGoods } from '@/api/cart'
+import { getNewCartGoods, mergeCart, findCartList, insertCart, deleteCart, updateCart, checkAllCart } from '@/api/cart'
 
 export default {
   namespaced: true,
@@ -45,6 +45,10 @@ export default {
     deleteCart (state, skuId) {
       const index = state.list.findIndex(item => item.skuId === skuId)
       state.list.splice(index, 1)
+    },
+    setCart (state, payload) {
+      // payload为空数组，则是清空数组
+      state.list = payload
     }
   },
   getters: {
@@ -88,6 +92,12 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // aleady login
+          updateCart(payload).then(() => {
+            return findCartList()
+          }).then(data => {
+            context.commit('setCart', data.result)
+            resolve()
+          })
         } else {
           // not login
           context.commit('updateCart', payload)
@@ -100,6 +110,13 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // aleady login
+          const ids = context.getters.validList.map(item => item.skuId)
+          checkAllCart({ selected, ids }).then(() => {
+            return findCartList()
+          }).then(data => {
+            context.commit('setCart', data.result)
+            resolve()
+          })
         } else {
           // not login
           context.getters.validList.forEach(goods => {
@@ -118,7 +135,12 @@ export default {
          */
         if (context.rootState.user.profile.token) {
         // 已登录
-
+          insertCart({ skuId: payload.skuId, count: payload.count }).then(() => {
+            return findCartList()
+          }).then(data => {
+            context.commit('setCart', data.result)
+            resolve()
+          })
         } else {
         // 未登录
           context.commit('insertCart', payload)
@@ -131,6 +153,9 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // aleady login
+          findCartList().then(data => {
+            context.commit('setCart', data.result)
+          })
         } else {
           // not login
           // 同时发送所有商品请求，等所有请求成功，一起修改本地数据
@@ -153,6 +178,12 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // aleady login
+          deleteCart([payload]).then(() => {
+            return findCartList()
+          }).then(data => {
+            context.commit('setCart', data.result)
+            resolve()
+          })
         } else {
           // not login
           context.commit('deleteCart', payload)
@@ -165,6 +196,13 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // aleady login
+          const ids = context.getters[isClear ? 'invalidList' : 'selectedList'].map(item => item.skuId)
+          deleteCart(ids).then(() => {
+            return findCartList()
+          }).then(data => {
+            context.commit('setCart', data.result)
+            resolve()
+          })
         } else {
           // not login
           // 找出选中的商品
@@ -175,10 +213,24 @@ export default {
         }
       })
     },
+    // 修改规格
     updateCartSku (context, { oldSkuId, newSku }) {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // aleady login
+          // 1.找出旧的的商品信息
+          // 2.删除旧的商品数据
+          // 3.需要商品原先的数量的新的skuId，进行添加和删除
+          // 4. 添加新的商品
+          const oldGoods = context.state.list.find(item => item.skuId === oldSkuId)
+          deleteCart([oldGoods.skuId]).then(() => {
+            return insertCart({ skuId: newSku.skuId, count: oldGoods.count })
+          }).then(() => {
+            return findCartList()
+          }).then(data => {
+            context.commit('setCart', data.result)
+            resolve()
+          })
         } else {
           // not login
           // 1.找出旧的的商品信息
@@ -193,6 +245,19 @@ export default {
           resolve()
         }
       })
+    },
+    // 合并购物车
+    async mergeCart (context) {
+      const cartList = context.state.list.map(goods => {
+        return {
+          skuId: goods.skuId,
+          selected: goods.selected,
+          count: goods.count
+        }
+      })
+      await mergeCart(cartList)
+      // 合并成功，清空本地
+      context.commit('setCart', [])
     }
   }
 }
