@@ -158,9 +158,13 @@ export default {
       // 3. 路由守卫，遇见需要登录的路由跳转，拦截到登录页面
       // 首先会跳转到结算页，登录之后会回跳到结算页
       if (store.getters['cart/selectedList'].length === 0) return Message({ text: '至少选择一件商品进行结算！' })
-      Confirm({ text: '下单结算需要登陆，您确定现在去登录吗？' }).then(() => {
+      if (!store.state.user.profile.token) {
+        Confirm({ text: '下单结算需要登陆，您确定现在去登录吗？' }).then(() => {
+          router.push('/member/checkout')
+        }).catch(e => {})
+      } else {
         router.push('/member/checkout')
-      }).catch(e => {})
+      }
     }
 
     return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku, checkout }
