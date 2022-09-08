@@ -12,7 +12,9 @@ const routes = [
       { path: '/category/sub/:id', component: () => import('@/views/category/sub') },
       { path: '/product/:id', component: () => import('@/views/goods/index') },
       { path: '/cart', component: () => import('@/views/cart/index') },
-      { path: '/member/checkout', component: () => import('@/views/member/pay/checkout') }
+      { path: '/member/checkout', component: () => import('@/views/member/pay/checkout') },
+      { path: '/member/pay', component: () => import('@/views/member/pay/index') },
+      { path: '/pay/callback', component: () => import('@/views/member/pay/result.vue') }
     ]
   },
   {
