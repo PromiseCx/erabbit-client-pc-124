@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import store from '@/store'
+import { h } from 'vue'
 
 const routes = [
   // 一级路由布局容器
@@ -14,7 +15,23 @@ const routes = [
       { path: '/cart', component: () => import('@/views/cart/index') },
       { path: '/member/checkout', component: () => import('@/views/member/pay/checkout') },
       { path: '/member/pay', component: () => import('@/views/member/pay/index') },
-      { path: '/pay/callback', component: () => import('@/views/member/pay/result.vue') }
+      { path: '/pay/callback', component: () => import('@/views/member/pay/result.vue') },
+      {
+        path: '/member',
+        component: () => import('@/views/member/Layout.vue'),
+        children: [
+          { path: '/member', component: () => import('@/views/member/home') },
+          {
+            path: '/member/order',
+            component: { render: () => h(<RouterView />) },
+            children: [
+              // vue3.0要使用模糊胡匹配，必须形成一个嵌套关系
+              { path: '', component: () => import('@/views/member/order/index.vue') },
+              { path: ':id', component: () => import('@/views/member/order/detail.vue') }
+            ]
+          }
+        ]
+      }
     ]
   },
   {

@@ -28,4 +28,7 @@ import '@/assets/iconfont/iconfont.css'
 // 自己的重置样式
 import '@/assets/styles/common.less'
 
+// 模拟mock.js
+import '@/mock'
+
 createApp(App).use(store).use(router).use(UI).mount('#app')
