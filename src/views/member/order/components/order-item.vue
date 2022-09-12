@@ -49,7 +49,7 @@
             <!-- 已取消：查看详情 -->
            <XtxButton @click="$router.push(`/member/pay/?orderId=${order.id}`)" v-if="order.orderState===1" type="primary" size="small">立即付款</XtxButton>
            <XtxButton @click="$emit('on-confirm',order)" v-if="order.orderState===3" type="primary" size="small">确认收货</XtxButton>
-           <p><a  @click="$router.push(`/member/pay/?orderId=${order.id}`)" href="javascript:;">查看详情</a></p>
+           <p><a  @click="$router.push(`/member/order/${order.id}`)" href="javascript:;">查看详情</a></p>
            <p @click="$emit('on-cancel',order)" v-if="order.orderState===1"><a href="javascript:;">取消订单</a></p>
            <p v-if="[2,3,4,5].includes(order.orderState)"><a href="javascript:;">再次购买</a></p>
            <p v-if="[4,5].includes(order.orderState)"><a href="javascript:;">申请售后</a></p>
