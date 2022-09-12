@@ -23,3 +23,13 @@ export const orderStatus = [
   { name: 'complete', label: '已完成' },
   { name: 'cancel', label: '已取消' }
 ]
+
+// 取消订单原因
+export const cancelReason = [
+  '配送信息有误',
+  '商品买错了',
+  '重复下单/误下单',
+  '忘记使用优惠券、兔币等',
+  '其他渠道价格更低',
+  '不想买了'
+]

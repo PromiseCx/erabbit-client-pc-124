@@ -60,7 +60,7 @@ export default {
       })
     }
     </nav>
-    return <div class="xtx-tabs">{[nav, dynamicPanels]}</div>
+    return <div class="xtx-tabs">{[nav]}</div>
   }
 }
 </script>
