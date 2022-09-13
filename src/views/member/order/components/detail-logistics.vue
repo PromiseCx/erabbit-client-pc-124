@@ -1,16 +1,37 @@
 <template>
   <div class="detail-logistics">
     <p>
-      <span>2016-09-14 15:00:32</span>
-      <span>浦东转运中心公司 已收入</span>
+      <span>{{list[0].text}}</span>
+      <span>{{list[0].time}}</span>
     </p>
-    <a href="javascript:;">查看物流</a>
+    <a href="javascript:;" @click="handlerLogistics(order)">查看物流</a>
+    <Teleport to="#model">
+      <OrderLogistics ref="orderLogisticsCom" />
+    </Teleport>
   </div>
 </template>
 
 <script>
+import { logisticsOrder } from '@/api/order'
+import { ref } from 'vue'
+import OrderLogistics from './order-logistics.vue'
+import { useLogistics } from '../index.vue'
+
 export default {
-  name: 'DetailLogistics'
+  name: 'DetailLogistics',
+  components: { OrderLogistics },
+  props: {
+    order: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  // 组件实例化的时候需要执行setup，因为需要返回模板需要的数据
+  async setup (props) {
+    const data = await logisticsOrder(props.order.id)
+    const list = ref(data.result.list)
+    return { list, ...useLogistics() }
+  }
 }
 </script>
 
